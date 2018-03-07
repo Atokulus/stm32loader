@@ -338,7 +338,7 @@ class CommandInterface:
 
 
 def usage():
-    help_text = """Usage: %s [-hqVewvr] [-l length] [-p port] [-b baud] [-a address] [-g address] [file.bin]
+    help_text = """Usage: %s [-hqVewvr] -p port [-l length] [-b baud] [-a address] [-g address] [file.bin]
     -h          This help
     -q          Quiet
     -V          Verbose
@@ -346,8 +346,8 @@ def usage():
     -w          Write
     -v          Verify (recommended)
     -r          Read
+    -p port     Serial port (example: /dev/tty.usbserial-ftCYPMYJ or COM5)
     -l length   Length of read
-    -p port     Serial port (default: /dev/tty.usbserial-ftCYPMYJ)
     -b baud     Baud speed (default: 115200)
     -a address  Target address
     -g address  Address to start running at (0x08000000, usually)
@@ -360,8 +360,10 @@ def usage():
 
 if __name__ == "__main__":
     
+    # default configuration values
     configuration = {
-        'port': '/dev/tty.usbserial-ftCYPMYJ',
+        # note: enter your serial port here if you don't want to specify it on the command line
+        'port': None,
         'baud': 115200,
         'address': 0x08000000,
         'erase': 0,
@@ -411,6 +413,12 @@ if __name__ == "__main__":
             configuration['length'] = eval(a)
         else:
             assert False, "unhandled option"
+
+    if not configuration['port']:
+        print("Please specify a serial port.")
+        usage()
+        sys.exit(2)
+
 
     interface = CommandInterface()
     interface.open(configuration['port'], configuration['baud'])
